@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "575711175949",
+    "project_id": "trini-flutter-project",
+    "storage_bucket": "trini-flutter-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575711175949:android:aecfdb1bcb22e2c6da7c44",
+        "android_client_info": {
+          "package_name": "com.trini.trini"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "575711175949-frmarinre8p7flvu6hiht3eoeq2p35j2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpHMFVXIyEsKW0RyAJlb5WbGJoMmqXinQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "575711175949-frmarinre8p7flvu6hiht3eoeq2p35j2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
