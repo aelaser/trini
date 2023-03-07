@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,15 +9,49 @@ import 'package:trini/services/crud/crud_exceptions.dart';
 class WorkoutService {
   Database? _db;
 
+  // stream controller
+  List<DatabaseWorkout> _workouts = [];
+
+  static final WorkoutService _shared = WorkoutService._sharedWorkouts();
+  WorkoutService._sharedWorkouts();
+  factory WorkoutService() => _shared;
+
+  final _workoutsStreamController =
+      StreamController<List<DatabaseWorkout>>.broadcast();
+
+  Stream<List<DatabaseWorkout>> get allWorkouts =>
+      _workoutsStreamController.stream;
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _cashWorkouts() async {
+    final allWorkouts = await getAllWorkouts();
+    _workouts = allWorkouts.toList();
+    _workoutsStreamController.add(_workouts);
+  }
+
   // update your workouts
-  Future<DatabaseWorkout> updateNote({
+  Future<DatabaseWorkout> updateWorkout({
     required DatabaseWorkout workout,
     required String text,
   }) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
+    // make sure workout exists
     await getWorkout(id: workout.id);
 
+    // update DB
     final updatesCount = await db.update(workoutTable, {
       textColumn: text,
       isSyncedWithCloudColumn: 0,
@@ -24,12 +60,17 @@ class WorkoutService {
     if (updatesCount == 0) {
       throw CouldNotUpdateWorkout;
     } else {
-      return await getWorkout(id: workout.id);
+      final updateWorkout = await getWorkout(id: workout.id);
+      _workouts.removeWhere((workout) => workout.id == updateWorkout.id);
+      _workouts.add(updateWorkout);
+      _workoutsStreamController.add(_workouts);
+      return updateWorkout;
     }
   }
 
   // Get all workouts
   Future<Iterable<DatabaseWorkout>> getAllWorkouts() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final workouts = await db.query(
       workoutTable,
@@ -40,6 +81,7 @@ class WorkoutService {
 
   // Get one workout
   Future<DatabaseWorkout> getWorkout({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final workouts = await db.query(
       workoutTable,
@@ -51,17 +93,26 @@ class WorkoutService {
     if (workouts.isEmpty) {
       throw CouldNotFindUser();
     } else {
-      return DatabaseWorkout.fromRow(workouts.first);
+      final workout = DatabaseWorkout.fromRow(workouts.first);
+      _workouts.removeWhere((workout) => workout.id == id);
+      _workouts.add(workout);
+      _workoutsStreamController.add(_workouts);
+      return workout;
     }
   }
 
   // Delete all workouts
   Future<int> deleteAllWorkouts() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    return await db.delete(workoutTable);
+    final numberOfDeletions = db.delete(workoutTable);
+    _workouts = [];
+    _workoutsStreamController.add(_workouts);
+    return numberOfDeletions;
   }
 
   Future<void> deleteWorkout({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -70,10 +121,14 @@ class WorkoutService {
     );
     if (deletedCount == 0) {
       throw CouldNotDeleteWorkout();
+    } else {
+      _workouts.removeWhere((workout) => workout.id == id);
+      _workoutsStreamController.add(_workouts);
     }
   }
 
   Future<DatabaseWorkout> createWorkout({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the databse with the correct id
@@ -98,10 +153,14 @@ class WorkoutService {
       isSyncedWithCloud: true,
     );
 
+    _workouts.add(workout);
+    _workoutsStreamController.add(_workouts);
+
     return workout;
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     final results = await db.query(
@@ -119,6 +178,7 @@ class WorkoutService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -141,6 +201,7 @@ class WorkoutService {
   }
 
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -171,6 +232,12 @@ class WorkoutService {
     }
   }
 
+  Future<void> _ensureDbIsOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {}
+  }
+
   Future<void> open() async {
     if (_db != null) {
       throw DatabaseAlreadyOpenException();
@@ -186,6 +253,7 @@ class WorkoutService {
 
       // create workout table
       await db.execute(createWorkoutTable);
+      await _cashWorkouts();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentDirecotory();
     }
