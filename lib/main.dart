@@ -13,7 +13,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter App Trini',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
