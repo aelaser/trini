@@ -1,4 +1,4 @@
-# trini
+# Trini
 
 A new Flutter project.
 
