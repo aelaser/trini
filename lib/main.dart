@@ -5,9 +5,10 @@ import 'package:trini/services/auth/auth_service.dart';
 import 'package:trini/views/login_view.dart';
 import 'package:trini/views/register_view.dart';
 import 'package:trini/views/verify_email_view.dart';
+import 'package:trini/views/workouts/new_workout_view.dart';
 import 'dart:developer' as devtools show log;
 
-import 'views/workout_view.dart';
+import 'package:trini/views/workouts/workout_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ void main() {
         registerRoute: (context) => const RegisterView(),
         dashboardRoute: (context) => const DashboardView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
+        newWorkoutRoute: (context) => const NewWorkoutView(),
       },
     ),
   );

@@ -32,6 +32,12 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("All Workouts"), actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed(newWorkoutRoute);
+          },
+          icon: const Icon(Icons.add),
+        ),
         PopupMenuButton<MenuAction>(
           onSelected: (value) async {
             switch (value) {
