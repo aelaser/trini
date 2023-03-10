@@ -74,6 +74,7 @@ class _DashboardViewState extends State<DashboardView> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
+                    case ConnectionState.active:
                       return const Text("Waiting for all workouts...");
                     default:
                       return const CircularProgressIndicator();
