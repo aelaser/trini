@@ -19,14 +19,7 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   void initState() {
     _workoutsService = WorkoutService();
-    _workoutsService.open();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _workoutsService.close();
-    super.dispose();
   }
 
   Widget build(BuildContext context) {
@@ -75,7 +68,25 @@ class _DashboardViewState extends State<DashboardView> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return const Text("Waiting for all workouts...");
+                      if (snapshot.hasData) {
+                        final allWorkouts =
+                            snapshot.data as List<DatabaseWorkout>;
+                        return ListView.builder(
+                            itemCount: allWorkouts.length,
+                            itemBuilder: (context, index) {
+                              final workout = allWorkouts[index];
+                              return ListTile(
+                                title: Text(
+                                  workout.text,
+                                  maxLines: 1,
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            });
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
                     default:
                       return const CircularProgressIndicator();
                   }

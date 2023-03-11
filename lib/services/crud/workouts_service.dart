@@ -13,11 +13,17 @@ class WorkoutService {
   List<DatabaseWorkout> _workouts = [];
 
   static final WorkoutService _shared = WorkoutService._sharedWorkouts();
-  WorkoutService._sharedWorkouts();
+  WorkoutService._sharedWorkouts() {
+    _workoutsStreamController =
+        StreamController<List<DatabaseWorkout>>.broadcast(
+      onListen: () {
+        _workoutsStreamController.sink.add(_workouts);
+      },
+    );
+  }
   factory WorkoutService() => _shared;
 
-  final _workoutsStreamController =
-      StreamController<List<DatabaseWorkout>>.broadcast();
+  late final StreamController<List<DatabaseWorkout>> _workoutsStreamController;
 
   Stream<List<DatabaseWorkout>> get allWorkouts =>
       _workoutsStreamController.stream;
