@@ -10,6 +10,8 @@ import 'dart:developer' as devtools show log;
 
 import 'package:trini/views/workouts/workout_view.dart';
 
+import 'views/workouts/create_update_workout_view.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -28,7 +30,8 @@ void main() {
         registerRoute: (context) => const RegisterView(),
         dashboardRoute: (context) => const DashboardView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
-        newWorkoutRoute: (context) => const NewWorkoutView(),
+        createOrUpdateWorkouteRoute: (context) =>
+            const CreateUpdateWorkoutView(),
       },
     ),
   );
