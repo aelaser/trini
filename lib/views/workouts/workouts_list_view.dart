@@ -18,31 +18,32 @@ class WorkoutsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: workouts.length,
-      itemBuilder: (context, index) {
-        final workout = workouts.elementAt(index);
-        return ListTile(
-          onTap: () {
-            onTap(workout);
-          },
-          title: Text(
-            workout.text,
-            maxLines: 1,
-            softWrap: true,
-            overflow: TextOverflow.ellipsis,
-          ),
-          // trailing: IconButton(
-          //   onPressed: () async {
-          //     final shouldDelete = await showDeleteDialog(context);
-          //     if (shouldDelete) {
-          //       onDeleteWorkout(workout);
-          //     }
-          //   },
-          //   icon: const Icon(Icons.delete),
-          // ),
-        );
-      },
-    );
+    return Scaffold();
+    // return ListView.builder(
+    //   itemCount: workouts.length,
+    //   itemBuilder: (context, index) {
+    //     final workout = workouts.elementAt(index);
+    //     return ListTile(
+    //       onTap: () {
+    //         onTap(workout);
+    //       },
+    //       title: Text(
+    //         workout.text,
+    //         maxLines: 1,
+    //         softWrap: true,
+    //         overflow: TextOverflow.ellipsis,
+    //       ),
+    //       // trailing: IconButton(
+    //       //   onPressed: () async {
+    //       //     final shouldDelete = await showDeleteDialog(context);
+    //       //     if (shouldDelete) {
+    //       //       onDeleteWorkout(workout);
+    //       //     }
+    //       //   },
+    //       //   icon: const Icon(Icons.delete),
+    //       // ),
+    //     );
+    //   },
+    // );
   }
 }

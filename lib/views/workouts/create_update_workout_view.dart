@@ -18,11 +18,13 @@ class _CreateUpdateWorkoutViewState extends State<CreateUpdateWorkoutView> {
   CloudWorkout? _workout;
   late final FirebaseCloudStorage _workoutsService;
   late final TextEditingController _textController;
+  late final TextEditingController _setsController;
 
   @override
   void initState() {
     _workoutsService = FirebaseCloudStorage();
     _textController = TextEditingController();
+    _setsController = TextEditingController();
     super.initState();
   }
 
@@ -32,15 +34,19 @@ class _CreateUpdateWorkoutViewState extends State<CreateUpdateWorkoutView> {
       return;
     }
     final text = _textController.text;
+    final sets = _setsController.text;
     await _workoutsService.updateWorkout(
       documentId: workout.documentId,
       text: text,
+      sets: sets,
     );
   }
 
   void _setupTextControllerListener() {
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
+    _setsController.addListener(_textControllerListener);
+    _setsController.removeListener(_textControllerListener);
   }
 
   Future<CloudWorkout> createOrGetExistingWorkout(BuildContext context) async {
@@ -49,6 +55,7 @@ class _CreateUpdateWorkoutViewState extends State<CreateUpdateWorkoutView> {
     if (widgetWorkout != null) {
       _workout = widgetWorkout;
       _textController.text = widgetWorkout.text;
+      _setsController.text = widgetWorkout.sets;
       return widgetWorkout;
     }
 
@@ -74,10 +81,12 @@ class _CreateUpdateWorkoutViewState extends State<CreateUpdateWorkoutView> {
   void _saveWorkoutIfTextNotEmpty() async {
     final workout = _workout;
     final text = _textController.text;
+    final sets = _setsController.text;
     if (workout != null && text.isNotEmpty) {
       await _workoutsService.updateWorkout(
         documentId: workout.documentId,
         text: text,
+        sets: sets,
       );
     }
   }
@@ -87,6 +96,7 @@ class _CreateUpdateWorkoutViewState extends State<CreateUpdateWorkoutView> {
     _deleteWorkoutIfTextIsEmpty();
     _saveWorkoutIfTextNotEmpty();
     _textController.dispose();
+    _setsController.dispose();
     super.dispose();
   }
 
@@ -104,13 +114,25 @@ class _CreateUpdateWorkoutViewState extends State<CreateUpdateWorkoutView> {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               _setupTextControllerListener();
-              return TextField(
-                controller: _textController,
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: InputDecoration(
-                  hintText: "Start typing you workout",
-                ),
+              return Column(
+                children: [
+                  TextField(
+                    controller: _textController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: "Start typing you workout",
+                    ),
+                  ),
+                  TextField(
+                    controller: _setsController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: "Start typing your sets",
+                    ),
+                  ),
+                ],
               );
             default:
               return const CircularProgressIndicator();

@@ -17,9 +17,12 @@ class FirebaseCloudStorage {
   Future<void> updateWorkout({
     required String documentId,
     required String text,
+    required String sets,
   }) async {
     try {
-      await workouts.doc(documentId).update({textFieldName: text});
+      await workouts
+          .doc(documentId)
+          .update({textFieldName: text, setsFieldName: sets});
     } catch (e) {
       throw CouldNotUpdateWorkoutException();
     }
@@ -38,12 +41,14 @@ class FirebaseCloudStorage {
     final document = await workouts.add({
       ownerUserIdFieldName: ownerUserId,
       textFieldName: '',
+      setsFieldName: '',
     });
     final fetchedWorkout = await document.get();
     return CloudWorkout(
       documentId: fetchedWorkout.id,
       ownerUserId: ownerUserId,
       text: '',
+      sets: '',
     );
   }
 

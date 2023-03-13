@@ -8,15 +8,20 @@ class CloudWorkout {
   final String documentId;
   final String ownerUserId;
   final String text;
+  final String sets;
   const CloudWorkout({
     required this.documentId,
     required this.ownerUserId,
     required this.text,
+    // I added this
+    required this.sets,
   });
 
   CloudWorkout.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : documentId = snapshot.id,
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
-        text = snapshot.data()[textFieldName] as String;
+        text = snapshot.data()[textFieldName] as String,
+        // I added this
+        sets = snapshot.data()[setsFieldName] as String;
 }
